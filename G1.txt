@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ArcadeVerse - Play Free Retro Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+--bg: #090a10;
+--card-bg: #121526;
+--accent-neon: #00f3ff;
+--accent-pink: #ff0077;
+--accent-green: #00ff88;
+--accent-yellow: #ffea00;
+--text: #f0f3fc;
+--text-muted: #8b95b5;
+}
+
+* {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+user-select: none;
+-webkit-tap-highlight-color: transparent;
+}
+
+body {
+background-color: var(--bg);
+color: var(--text);
+font-family: 'Rajdhani', sans-serif;
+overflow-x: hidden;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+}
+
+header {
+background: rgba(18, 21, 38, 0.85);
+backdrop-filter: blur(12px);
+border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+padding: 16px 24px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+position: sticky;
+top: 0;
+z-index: 100;
+}
+
+.brand {
+font-family: 'Orbitron', sans-serif;
+font-size: 1.5rem;
+font-weight: 900;
+color: var(--accent-neon);
+text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.brand span {
+color: var(--accent-pink);
+}
+
+.sound-btn {
+background: #1b203a;
+border: 1px solid var(--accent-neon);
+color: var(--accent-neon);
+border-radius: 8px;
+padding: 8px 14px;
+font-weight: bold;
+cursor: pointer;
+font-family: 'Rajdhani', sans-serif;
+transition: 0.2s;
+}
+
+.sound-btn:hover {
+background: var(--accent-neon);
+color: #000;
+}
+
+.hero {
+text-align: center;
+padding: 40px 20px 20px;
+}
+
+.hero h1 {
+font-family: 'Orbitron', sans-serif;
+font-size: clamp(2rem, 5vw, 3.2rem);
+margin-bottom: 10px;
+background: linear-gradient(90deg, var(--accent-neon), var(--accent-pink));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+
+.hero p {
+color: var(--text-muted);
+font-size: 1.15rem;
+}
+
+.grid-container {
+max-width: 1100px;
+margin: 30px auto;
+padding: 0 20px;
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 24px;
+width: 100%;
+}
+
+.game-card {
+background: var(--card-bg);
+border: 1px solid rgba(255, 255, 255, 0.08);
+border-radius: 16px;
+padding: 24px;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+transition: all 0.3s ease;
+position: relative;
+overflow: hidden;
+}
+
+.game-card::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 4px;
+background: linear-gradient(90deg, var(--accent-neon), var(--accent-pink));
+opacity: 0;
+transition: 0.3s;
+}
+
+.game-card:hover {
+transform: translateY(-6px);
+border-color: rgba(0, 243, 255, 0.4);
+box-shadow: 0 10px 30px rgba(0, 243, 255, 0.15);
+}
+
+.game-card:hover::before {
+opacity: 1;
+}
+
+.card-tag {
+align-self: flex-start;
+font-size: 0.75rem;
+padding: 4px 8px;
+border-radius: 4px;
+background: rgba(0, 243, 255, 0.1);
+color: var(--accent-neon);
+margin-bottom: 12px;
+font-family: 'Orbitron', sans-serif;
+}
+
+.game-title {
+font-family: 'Orbitron', sans-serif;
+font-size: 1.4rem;
+margin-bottom: 8px;
+}
+
+.game-desc {
+color: var(--text-muted);
+font-size: 0.95rem;
+margin-bottom: 20px;
+line-height: 1.4;
+}
+
+.highscore-badge {
+font-size: 0.9rem;
+color: var(--accent-yellow);
+margin-bottom: 16px;
+display: flex;
+align-items: center;
+gap: 6px;
+}
+
+.play-btn {
+background: linear-gradient(135deg, var(--accent-neon), #0077ff);
+color: #000;
+font-family: 'Orbitron', sans-serif;
+font-weight: 700;
+border: none;
+padding: 12px;
+border-radius: 8px;
+cursor: pointer;
+text-transform: uppercase;
+font-size: 0.95rem;
+transition: 0.2s;
+}
+
+.play-btn:hover {
+filter: brightness(1.2);
+box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+}
+
+/* Modal Styling */
+.game-modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+background: rgba(5, 6, 12, 0.92);
+backdrop-filter: blur(10px);
+display: none;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+z-index: 1000;
+padding: 15px;
+}
+
+.game-modal.active {
+display: flex;
+}
+
+.modal-header {
+width: 100%;
+max-width: 460px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 12px;
+}
+
+.game-stats {
+display: flex;
+gap: 16px;
+font-family: 'Orbitron', sans-serif;
+font-size: 1.1rem;
+color: var(--accent-neon);
+}
+
+.close-btn {
+background: #ff0055;
+color: #fff;
+border: none;
+padding: 6px 14px;
+border-radius: 6px;
+cursor: pointer;
+font-weight: bold;
+font-family: 'Orbitron', sans-serif;
+}
+
+canvas {
+background: #000;
+border: 2px solid var(--accent-neon);
+border-radius: 12px;
+box-shadow: 0 0 25px rgba(0, 243, 255, 0.2);
+touch-action: none;
+max-width: 100%;
+max-height: 60vh;
+}
+
+/* Mobile Controls Pad */
+.dpad-container {
+margin-top: 15px;
+display: none;
+grid-template-columns: repeat(3, 50px);
+grid-template-rows: repeat(2, 45px);
+gap: 6px;
+}
+
+.dpad-btn {
+background: #1b203a;
+border: 1px solid rgba(255, 255, 255, 0.2);
+color: #fff;
+font-size: 1.2rem;
+border-radius: 8px;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+}
+
+.dpad-btn:active {
+background: var(--accent-neon);
+color: #000;
+}
+
+footer {
+margin-top: auto;
+text-align: center;
+padding: 20px;
+border-top: 1px solid rgba(255, 255, 255, 0.05);
+color: var(--text-muted);
+font-size: 0.9rem;
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="brand">ARCADE<span>VERSE</span></div>
+<button class="sound-btn" id="soundBtn" onclick="toggleAudio()">SOUND: ON</button>
+</header>
+
+<div class="hero">
+<h1>CYBER ARCADE</h1>
+<p>ব্রাউজারে সরাসরি খেলুন ক্লাসিক নিয়ন রেট্রো গেমস</p>
+</div>
+
+<div class="grid-container">
+<!-- Snake Game Card -->
+<div class="game-card">
+<span class="card-tag">ARCADE</span>
+<h3 class="game-title">Neon Snake</h3>
+<p class="game-desc">ক্লাসিক স্নেক গেম! নিয়ন খাবার খান, বড় হোন এবং দেয়াল কিংবা লেজের সাথে ধাক্কা এড়িয়ে চলুন।</p>
+<div class="highscore-badge">🏆 High Score: <span id="snake-high">0</span></div>
+<button class="play-btn" onclick="openGame('snake')">Play Now</button>
+</div>
+
+<!-- Space Blaster Card -->
+<div class="game-card">
+<span class="card-tag">ACTION</span>
+<h3 class="game-title">Space Blaster</h3>
+<p class="game-desc">মহাকাশ জাহাজ নিয়ে শত্রু ও উল্কাপিণ্ড ধ্বংস করুন। লেজার গান চালান এবং সর্বোচ্চ স্কোর তুলুন।</p>
+<div class="highscore-badge">🏆 High Score: <span id="space-high">0</span></div>
+<button class="play-btn" onclick="openGame('space')">Play Now</button>
+</div>
+
+<!-- Brick Breaker Card -->
+<div class="game-card">
+<span class="card-tag">PUZZLE</span>
+<h3 class="game-title">Neon Breaker</h3>
+<p class="game-desc">প্যাডেল দিয়ে বল বাউন্স করে সমস্ত নিয়ন ইট ভেঙে দিন। বল যেন নিচে না পড়ে!</p>
+<div class="highscore-badge">🏆 High Score: <span id="brick-high">0</span></div>
+<button class="play-btn" onclick="openGame('brick')">Play Now</button>
+</div>
+</div>
+
+<!-- Game Modal Screen -->
+<div class="game-modal" id="gameModal">
+<div class="modal-header">
+<div class="game-stats">
+<div>SCORE: <span id="liveScore">0</span></div>
+<div id="livesContainer" style="display:none;">LIVES: <span id="liveLives">3</span></div>
+</div>
+<button class="close-btn" onclick="closeGame()">EXIT</button>
+</div>
+
+<canvas id="gameCanvas" width="400" height="500"></canvas>
+
+<!-- Mobile Screen Controls -->
+<div class="dpad-container" id="dpad">
+<div style="grid-column: 2;" class="dpad-btn" onclick="handleDpad('UP')">▲</div>
+<div style="grid-column: 1; grid-row: 2;" class="dpad-btn" onclick="handleDpad('LEFT')">◀</div>
+<div style="grid-column: 2; grid-row: 2;" class="dpad-btn" onclick="handleDpad('DOWN')">▼</div>
+<div style="grid-column: 3; grid-row: 2;" class="dpad-btn" onclick="handleDpad('RIGHT')">▶</div>
+</div>
+</div>
+
+<footer>
+<p>© 2026 ArcadeVerse. Built with HTML5 Canvas & Web Audio API.</p>
+</footer>
+
+<script>
+/* Audio System using Web Audio API */
+let audioCtx = null;
+let soundEnabled = true;
+
+function initAudio() {
+if (!audioCtx) {
+audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+}
+
+function playBeep(freq = 440, type = 'square', duration = 0.08) {
+if (!soundEnabled) return;
+initAudio();
+try {
+const osc = audioCtx.createOscillator();
+const gain = audioCtx.createGain();
+osc.type = type;
+osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+osc.connect(gain);
+gain.connect(audioCtx.destination);
+osc.start();
+osc.stop(audioCtx.currentTime + duration);
+} catch (e) {}
+}
+
+function toggleAudio() {
+soundEnabled = !soundEnabled;
+document.getElementById('soundBtn').textContent = soundEnabled ? 'SOUND: ON' : 'SOUND: OFF';
+}
+
+/* Storage & Scores */
+function getHigh(key) { return localStorage.getItem('arcade_' + key) || 0; }
+function setHigh(key, val) {
+if (val > getHigh(key)) {
+localStorage.setItem('arcade_' + key, val);
+updateScoreDisplays();
+}
+}
+
+function updateScoreDisplays() {
+document.getElementById('snake-high').innerText = getHigh('snake');
+document.getElementById('space-high').innerText = getHigh('space');
+document.getElementById('brick-high').innerText = getHigh('brick');
+}
+updateScoreDisplays();
+
+/* Canvas & Global Loop */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let currentGame = null;
+let animFrame = null;
+let currentScore = 0;
+
+function openGame(gameType) {
+initAudio();
+currentGame = gameType;
+currentScore = 0;
+document.getElementById('liveScore').innerText = '0';
+document.getElementById('gameModal').classList.add('active');
+document.getElementById('dpad').style.display = (gameType === 'snake') ? 'grid' : 'none';
+document.getElementById('livesContainer').style.display = (gameType === 'space' || gameType === 'brick') ? 'block' : 'none';
+
+if (gameType === 'snake') initSnake();
+if (gameType === 'space') initSpace();
+if (gameType === 'brick') initBrick();
+}
+
+function closeGame() {
+cancelAnimationFrame(animFrame);
+currentGame = null;
+document.getElementById('gameModal').classList.remove('active');
+}
+
+/* ================= 1. NEON SNAKE ================= */
+let snake, snakeDir, snakeNextDir, snakeFood, snakeTimer;
+const gridSize = 20;
+
+function initSnake() {
+snake = [{x: 10, y: 12}, {x: 10, y: 13}, {x: 10, y: 14}];
+snakeDir = {x: 0, y: -1};
+snakeNextDir = {x: 0, y: -1};
+spawnSnakeFood();
+snakeTimer = 0;
+runSnake();
+}
+
+function spawnSnakeFood() {
+snakeFood = {
+x: Math.floor(Math.random() * (canvas.width / gridSize)),
+y: Math.floor(Math.random() * (canvas.height / gridSize))
+};
+}
+
+function runSnake() {
+if (currentGame !== 'snake') return;
+
+snakeTimer++;
+if (snakeTimer % 8 === 0) { // গতির নিয়ন্ত্রণ
+snakeDir = snakeNextDir;
+const head = {x: snake[0].x + snakeDir.x, y: snake[0].y + snakeDir.y};
+
+// সীমানা পরীক্ষা
+if (head.x < 0 || head.x >= canvas.width / gridSize || head.y < 0 || head.y >= canvas.height / gridSize) {
+playBeep(150, 'sawtooth', 0.25);
+setHigh('snake', currentScore);
+alert('GAME OVER! Score: ' + currentScore);
+initSnake();
+return;
+}
+
+// নিজের লেজে ধাক্কা
+for (let part of snake) {
+if (part.x === head.x && part.y === head.y) {
+playBeep(150, 'sawtooth', 0.25);
+setHigh('snake', currentScore);
+alert('GAME OVER! Score: ' + currentScore);
+initSnake();
+return;
+}
+}
+
+snake.unshift(head);
+
+// খাবার খাওয়া
+if (head.x === snakeFood.x && head.y === snakeFood.y) {
+playBeep(600, 'sine', 0.08);
+currentScore += 10;
+document.getElementById('liveScore').innerText = currentScore;
+spawnSnakeFood();
+} else {
+snake.pop();
+}
+}
+
+// আঁকা
+ctx.fillStyle = '#060814';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// খাবার
+ctx.fillStyle = '#ff0077';
+ctx.shadowBlur = 15;
+ctx.shadowColor = '#ff0077';
+ctx.fillRect(snakeFood.x * gridSize + 2, snakeFood.y * gridSize + 2, gridSize - 4, gridSize - 4);
+
+// সাপ
+ctx.fillStyle = '#00f3ff';
+ctx.shadowColor = '#00f3ff';
+snake.forEach((part, i) => {
+ctx.fillRect(part.x * gridSize + 1, part.y * gridSize + 1, gridSize - 2, gridSize - 2);
+});
+ctx.shadowBlur = 0;
+
+animFrame = requestAnimationFrame(runSnake);
+}
+
+function handleDpad(dir) {
+if (currentGame !== 'snake') return;
+if (dir === 'UP' && snakeDir.y === 0) snakeNextDir = {x: 0, y: -1};
+if (dir === 'DOWN' && snakeDir.y === 0) snakeNextDir = {x: 0, y: 1};
+if (dir === 'LEFT' && snakeDir.x === 0) snakeNextDir = {x: -1, y: 0};
+if (dir === 'RIGHT' && snakeDir.x === 0) snakeNextDir = {x: 1, y: 0};
+}
+
+/* ================= 2. SPACE BLASTER ================= */
+let ship, lasers, enemies, spaceLives;
+
+function initSpace() {
+ship = { x: canvas.width / 2 - 15, y: canvas.height - 40, w: 30, h: 20, speed: 6 };
+lasers = [];
+enemies = [];
+spaceLives = 3;
+document.getElementById('liveLives').innerText = spaceLives;
+runSpace();
+}
+
+function runSpace() {
+if (currentGame !== 'space') return;
+
+ctx.fillStyle = '#070913';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// স্পেসশিপ
+ctx.fillStyle = '#00ff88';
+ctx.shadowBlur = 10;
+ctx.shadowColor = '#00ff88';
+ctx.fillRect(ship.x, ship.y, ship.w, ship.h);
+
+// লেজার আপডেট ও ড্র
+ctx.fillStyle = '#00f3ff';
+ctx.shadowColor = '#00f3ff';
+for (let i = lasers.length - 1; i >= 0; i--) {
+lasers[i].y -= 8;
+ctx.fillRect(lasers[i].x, lasers[i].y, 4, 10);
+if (lasers[i].y < 0) lasers.splice(i, 1);
+}
+
+// এনিমি তৈরি
+if (Math.random() < 0.03) {
+enemies.push({ x: Math.random() * (canvas.width - 25), y: -20, w: 25, h: 20, speed: 2 + Math.random() * 2 });
+}
+
+// এনিমি আপডেট
+ctx.fillStyle = '#ff0055';
+ctx.shadowColor = '#ff0055';
+for (let i = enemies.length - 1; i >= 0; i--) {
+let e = enemies[i];
+e.y += e.speed;
+ctx.fillRect(e.x, e.y, e.w, e.h);
+
+// লেজারের সাথে সংঘর্ষ
+for (let j = lasers.length - 1; j >= 0; j--) {
+if (lasers[j].x > e.x && lasers[j].x < e.x + e.w && lasers[j].y > e.y && lasers[j].y < e.y + e.h) {
+playBeep(300, 'sawtooth', 0.05);
+enemies.splice(i, 1);
+lasers.splice(j, 1);
+currentScore += 20;
+document.getElementById('liveScore').innerText = currentScore;
+break;
+}
+}
+
+// প্লেয়ারের নিচে দিয়ে বের হওয়া
+if (e && e.y > canvas.height) {
+enemies.splice(i, 1);
+spaceLives--;
+document.getElementById('liveLives').innerText = spaceLives;
+if (spaceLives <= 0) {
+playBeep(100, 'sawtooth', 0.3);
+setHigh('space', currentScore);
+alert('GAME OVER! Highscore: ' + currentScore);
+initSpace();
+return;
+}
+}
+}
+ctx.shadowBlur = 0;
+
+animFrame = requestAnimationFrame(runSpace);
+}
+
+/* ================= 3. BRICK BREAKER ================= */
+let paddle, ball, bricks, brickLives;
+
+function initBrick() {
+paddle = { x: canvas.width / 2 - 40, y: canvas.height - 25, w: 80, h: 10 };
+ball = { x: canvas.width / 2, y: canvas.height - 40, dx: 3.5, dy: -3.5, r: 6 };
+brickLives = 3;
+document.getElementById('liveLives').innerText = brickLives;
+
+// ব্রিক তৈরি
+bricks = [];
+const rows = 4, cols = 6;
+for (let r = 0; r < rows; r++) {
+for (let c = 0; c < cols; c++) {
+bricks.push({ x: c * 62
